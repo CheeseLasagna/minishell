@@ -11,7 +11,10 @@ void cd(char **args)
 	else
 	{
 		if (*(args + 1) != NULL)
+		{
 			write(1, "bash: cd: too many arguments\n", 29);
+			exit_status = 1;
+		}
 		else
 			if (chdir(*args) == -1)
 			{
@@ -21,6 +24,7 @@ void cd(char **args)
 				write(1, ": ", 2);
 				write(1, s, ft_strlen(s));
 				write(1, "\n", 1);
+				exit_status = 1;
 			}
 	}
 }

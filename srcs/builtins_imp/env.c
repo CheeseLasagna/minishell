@@ -2,11 +2,14 @@
 
 void	envp(char **env)
 {
-	while (*env != NULL)
+	if (env != NULL)
 	{
-		write(1, *env, ft_strlen(*env));	
-		write(1, "\n", 1);
-		env++;
+		while (*env != NULL)
+		{
+			write(1, *env, ft_strlen(*env));	
+			write(1, "\n", 1);
+			env++;
+		}
 	}
 }
 

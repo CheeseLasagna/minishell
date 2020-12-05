@@ -7,24 +7,35 @@ char	**new_double_array_export(char *arg, char **env, int len)
 	char **env1;
 
 	env1 = env;
-	new = (char **)malloc(sizeof(char *) * (len + 2));
+	if(!(new = (char **)malloc(sizeof(char *) * (len + 2))))
+		return (env);
 	new1 = new;
 	while (*env1 != NULL)
 	{
-		*new1 = ft_strdup(*env1); 
+		if(!(*new1 = ft_strdup(*env1))) 
+		{
+			ft_strarrclear(&new);
+			return (env);
+		}
 		new1++;
 		env1++;
 	}
-	free_arrah(env);
-	*new1 = ft_strdup(arg);
+	//free_arrah(env);
+	if (!(*new1 = ft_strdup(arg)))
+	{
+		ft_strarrclear(&new);
+		return (env);
+	}
 	new1++;
 	*new1 = NULL;
+	ft_strarrclear(&env);
 	return (new);
 }
 
 char	**add_to_env_list(char *arg, char **env)
 {
 	char **env1;
+	char *temp;
 	int len_res;
 
 	env1 = env;
@@ -34,13 +45,19 @@ char	**add_to_env_list(char *arg, char **env)
 		len_res = ft_strncmp(arg, *env1, len_res + 1);
 		if (!len_res)
 		{
-			free(*env1);
-			*env1 = ft_strdup(arg);
+			temp = *env1;
+			if(!(*env1 = ft_strdup(arg)))
+			{
+				*env1 = temp;
+				return (env);
+			}
+			free(temp);
 			return (env);
 		}
 		env1++;
 	}
-	len_res = find_doub_array_len(env);
+	//len_res = find_doub_array_len(env);
+	len_res = ft_strarrlen(env);
 	env = new_double_array_export(arg, env, len_res);	
 	return (env);
 }	

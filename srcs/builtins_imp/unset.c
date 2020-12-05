@@ -8,22 +8,28 @@ char	**new_double_array_unset(char *old, char **env, int oldlen)
 	int		len;
 
 	len = find_doub_array_len(env);
-	new = (char**)malloc(sizeof(char*) * len);
+	if (!(new = (char**)malloc(sizeof(char*) * len)))
+		return (env);
 	env1 = env;
 	new1 = new;
 	while (*env1 != NULL)
 	{
 		if ((ft_strncmp(old, *env1, oldlen)) != 0)
 		{
-			*new1 = ft_strdup(*env1);
+			if(!(*new1 = ft_strdup(*env1)))
+			{
+				ft_strarrclear(new);
+				return (env);
+			}
 			new1++;
 			env1++;
 		}
 		else
 			env1++;
 	}
-	free_arrah(env);
 	*new1 = NULL;
+	//free_arrah(env);
+	ft_strarrclear(new);
 	return (new);	
 }
 		
@@ -61,6 +67,7 @@ int check_args_unset(char *arg)
 			write(1, "bash: unset: '", 14);
 			write(1, arg, ft_strlen(arg));
 			write(1, "': not a valid identifier\n", 26);
+			exit_status = 1;
 			return (1);
 		}
 		c++;

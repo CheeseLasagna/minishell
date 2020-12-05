@@ -3,23 +3,41 @@
 void write_to_pipe(t_args *x)
 {
 	int id;
+	int rrr;
 	int fd[2];
-	char *command = "/usr/bin/";
+	char *str = "/usr/bin/";
 
-	pipe(fd);
+	if(pipe(fd) == -1)
+	{
+		str = strerror(errno);
+		write(1, str, ft_strlen(str));
+		write(1, "\n", 1);
+		return ;
+	}
 	id = fork();
-	command = ft_strjoin(command, *(x->args));
+	if (id == -1)
+	{
+		str = strerror(errno);
+		write(1, str, ft_strlen(str));
+		write(1, "\n", 1);
+		return ;
+	}
+	str = ft_strjoin(str, *(x->args));
 	if (id == 0)
 	//child process
 	{
 		dup2(fd[1], 1);
 		close(fd[0]);
 		close(fd[1]);
-		execv(command, x->args);
+		rrr = execve(str, x->args, x->env);
+		if (rrr == -1)
+			exit(127);
 	}
 	//parent process
-	waitpid(id, NULL, 0);
-	free(command);
+	waitpid(id, &rrr, 0);
+	if (WIFEXITED(rrr))
+		exit_status = WEXITSTATUS(rrr);
+	free(str);
 	dup2(fd[0], 0);
 	close(fd[1]);
 	close(fd[0]);
@@ -27,43 +45,93 @@ void write_to_pipe(t_args *x)
 
 void write_to_stdout(t_args *x)
 {
+	int rrr;
 	int id;
-	char *command = "/usr/bin/";
+	char *str = "/usr/bin/";
 
 	id = fork();
-	command = ft_strjoin(command, *(x->args));
+	if (id == -1)
+	{
+		str = strerror(errno);
+		write(1, str, ft_strlen(str));
+		write(1, "\n", 1);
+		dup2(x->temp_fd_0, 0);
+		return ;
+	}
+	str = ft_strjoin(str, *(x->args));
 	if (id == 0)
 	//child process
-		execv(command, x->args);
+	{
+		execve(str, x->args, x->env);
+		if (rrr == -1)
+			exit(127);
+	}
 	//parent process
-	waitpid(id, NULL, 0);
-	free(command);
+	waitpid(id, &rrr, 0);
+	if (WIFEXITED(rrr))
+		exit_status = WEXITSTATUS(rrr);
+	free(str);
 	dup2(x->temp_fd_0, 0);
 }
-	
+
+int find_descriptor(t_args *x)	
+{
+	char **files;
+	int fd;
+	int *write_append;
+
+	files = x->red_file;
+	write_append = x->write_append;
+	fd = 0;	
+	while (*files != NULL)
+	{
+		if (fd)
+			close(fd);
+		if (*write_append == 0)
+			fd = open(*files, O_WRONLY|O_TRUNC|O_CREAT, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH);
+		else
+			fd = open(*files, O_WRONLY|O_CREAT|O_APPEND, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH);
+		files++;
+		write_append++;
+	}
+	return (fd);
+}
 void write_to_file(t_args *x)
 {
 	int id;
 	int fd;
 	int len;
-	char *command = "/usr/bin/";
-	
+	int rrr;
+	char *str = "/usr/bin/";
 
-	if (x->write_append == 0)
+/*	if (x->write_append == 0)
 		fd = open(x->red_file, O_WRONLY|O_TRUNC|O_CREAT, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH);
 	else
-		fd = open(x->red_file, O_WRONLY|O_CREAT|O_APPEND, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH);
+		fd = open(x->red_file, O_WRONLY|O_CREAT|O_APPEND, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH);*/
+	fd = find_descriptor(x);
 	id = fork();
-	command = ft_strjoin(command, *(x->args));
+	if (id == -1)
+	{
+		str = strerror(errno);
+		write(1, str, ft_strlen(str));
+		write(1, "\n", 1);
+		dup2(x->temp_fd_0, 0);
+		return ;
+	}
+	str = ft_strjoin(str, *(x->args));
 	if (id == 0)
 	//child process
 	{
 		dup2(fd, 1);
-		execv(command, x->args);
+		rrr = execve(str, x->args, x->env);
+		if (rrr == -1)
+			exit(127);
 	}
 	//parent process
-	waitpid(id, NULL, 0);
-	free(command);
+	waitpid(id, &rrr, 0);
+	if (WIFEXITED(rrr))
+		exit_status = WEXITSTATUS(rrr);
+	free(str);
 	dup2(x->temp_fd_0, 0);
 }
 
@@ -89,6 +157,7 @@ int check_command(char **args)
 
 void exec_command(t_args *x, int flag)
 {
+	exit_status = 0;
 	x->orig_imp = check_command(x->args);
 	if (x->orig_imp != 0)
 		exec_command_imp(x, flag);
@@ -98,8 +167,8 @@ void exec_command(t_args *x, int flag)
 			write_to_pipe(x);
 		else if (flag == 2)
 			write_to_file(x);
-		else if (flag == 3)
-			from_file(x); 
+		//else if (flag == 3)
+			//from_file(x); 
 		else
 			write_to_stdout(x);
 	}

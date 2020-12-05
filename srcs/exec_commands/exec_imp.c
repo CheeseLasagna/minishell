@@ -24,10 +24,11 @@ void write_to_file_imp(t_args *x)
 	int fd;
 	
 
-	if (x->write_append == 0)
+	/*if (x->write_append == 0)
 		fd = open(x->red_file, O_WRONLY|O_TRUNC|O_CREAT, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH);
 	else
-		fd = open(x->red_file, O_WRONLY|O_CREAT|O_APPEND, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH);
+		fd = open(x->red_file, O_WRONLY|O_CREAT|O_APPEND, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH);*/
+	fd = find_descriptor(x);
 	dup2(fd, 1);
 	x->env = implement(x->args, x->env, x->orig_imp);
 	dup2(x->temp_fd_1, 1);
@@ -40,8 +41,8 @@ void exec_command_imp(t_args *x, int flag)
 		write_to_pipe_imp(x);
 	else if (flag == 2)
 		write_to_file_imp(x);
-	else if (flag == 3)
-		from_file_imp(x); 
+//	else if (flag == 3)
+	//	from_file_imp(x); 
 	else
 		write_to_stdout_imp(x);
 }
