@@ -1,13 +1,41 @@
 #include "../../includes/minishell.h"
 
+int check_pipe_fork(t_vars *vars)
+{
+	char *str;
+
+	if(pipe(vars->fd) == -1)
+	{
+		str = strerror(errno);
+		write(1, str, ft_strlen(str));
+		write(1, "\n", 1);
+		return (1);
+	}
+	vars->id = fork();
+	if (vars->id == -1)
+	{
+		str = strerror(errno);
+		write(1, str, ft_strlen(str));
+		write(1, "\n", 1);
+		close(vars->fd[0]);
+		close(vars->fd[1]);
+		return (1);
+	}
+	return (0);
+}
+
 void write_to_pipe(t_args *x)
 {
-	int id;
+	/*int id;
 	int rrr;
 	int fd[2];
-	char *str = "/usr/bin/";
+	char *str = "/usr/bin/";*/
+	t_vars vars;
 
-	if(pipe(fd) == -1)
+	vars.str = "/usr/bin/";
+	if (check_pipe_fork(&vars) == 1)
+		return ;
+	/*if(pipe(fd) == -1)
 	{
 		str = strerror(errno);
 		write(1, str, ft_strlen(str));
@@ -20,36 +48,59 @@ void write_to_pipe(t_args *x)
 		str = strerror(errno);
 		write(1, str, ft_strlen(str));
 		write(1, "\n", 1);
-		return ;
-	}
-	str = ft_strjoin(str, *(x->args));
-	if (id == 0)
-	//child process
-	{
-		dup2(fd[1], 1);
 		close(fd[0]);
 		close(fd[1]);
-		rrr = execve(str, x->args, x->env);
-		if (rrr == -1)
+		return ;
+	}*/
+	vars.str = ft_strjoin(vars.str, *(x->args));
+	if (vars.id == 0)
+	//child process
+	{
+		dup2(vars.fd[1], 1);
+		close(vars.fd[0]);
+		close(vars.fd[1]);
+		vars.ex_res = execve(vars.str, x->args, x->env);
+		if (vars.ex_res == -1)
 			exit(127);
 	}
 	//parent process
-	waitpid(id, &rrr, 0);
-	if (WIFEXITED(rrr))
-		exit_status = WEXITSTATUS(rrr);
-	free(str);
-	dup2(fd[0], 0);
-	close(fd[1]);
-	close(fd[0]);
+	waitpid(vars.id, &vars.ex_res, 0);
+	if (WIFEXITED(vars.ex_res))
+		exit_status = WEXITSTATUS(vars.ex_res);
+	free(vars.str);
+	dup2(vars.fd[0], 0);
+	close(vars.fd[1]);
+	close(vars.fd[0]);
+}
+
+int check_fork(t_vars *vars, int temp_fd_0)
+{
+	char *str;
+
+	vars->id = fork();
+	if (vars->id == -1)
+	{
+		str = strerror(errno);
+		write(1, str, ft_strlen(str));
+		write(1, "\n", 1);
+		dup2(temp_fd_0, 0);
+		close(vars->fdd);
+		return (1); 
+	}
+	return (0);
 }
 
 void write_to_stdout(t_args *x)
 {
-	int rrr;
+	/*int rrr;
 	int id;
-	char *str = "/usr/bin/";
+	char *str = "/usr/bin/";*/
+	t_vars vars;
 
-	id = fork();
+	vars.str = "/usr/bin/";
+	if (check_fork(&vars, x->temp_fd_0) == 1)
+		return ;
+	/*id = fork();
 	if (id == -1)
 	{
 		str = strerror(errno);
@@ -57,20 +108,20 @@ void write_to_stdout(t_args *x)
 		write(1, "\n", 1);
 		dup2(x->temp_fd_0, 0);
 		return ;
-	}
-	str = ft_strjoin(str, *(x->args));
-	if (id == 0)
+	}*/
+	vars.str = ft_strjoin(vars.str, *(x->args));
+	if (vars.id == 0)
 	//child process
 	{
-		execve(str, x->args, x->env);
-		if (rrr == -1)
+		vars.ex_res = execve(vars.str, x->args, x->env);
+		if (vars.ex_res == -1)
 			exit(127);
 	}
 	//parent process
-	waitpid(id, &rrr, 0);
-	if (WIFEXITED(rrr))
-		exit_status = WEXITSTATUS(rrr);
-	free(str);
+	waitpid(vars.id, &vars.ex_res, 0);
+	if (WIFEXITED(vars.ex_res))
+		exit_status = WEXITSTATUS(vars.ex_res);
+	free(vars.str);
 	dup2(x->temp_fd_0, 0);
 }
 
@@ -98,40 +149,46 @@ int find_descriptor(t_args *x)
 }
 void write_to_file(t_args *x)
 {
-	int id;
-	int fd;
-	int len;
+	/*int id;
+	int fdd;
 	int rrr;
-	char *str = "/usr/bin/";
+	char *str = "/usr/bin/";*/
+	t_vars vars;
 
 /*	if (x->write_append == 0)
 		fd = open(x->red_file, O_WRONLY|O_TRUNC|O_CREAT, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH);
 	else
 		fd = open(x->red_file, O_WRONLY|O_CREAT|O_APPEND, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH);*/
-	fd = find_descriptor(x);
-	id = fork();
+	vars.str = "/usr/bin/";
+	vars.fdd = find_descriptor(x);
+	if (check_fork(&vars, x->temp_fd_0) == 1)
+		return ;
+	/*id = fork();
 	if (id == -1)
 	{
 		str = strerror(errno);
 		write(1, str, ft_strlen(str));
 		write(1, "\n", 1);
+		close(fdd);
 		dup2(x->temp_fd_0, 0);
 		return ;
-	}
-	str = ft_strjoin(str, *(x->args));
-	if (id == 0)
+	}*/
+	vars.str = ft_strjoin(vars.str, *(x->args));
+	if (vars.id == 0)
 	//child process
 	{
-		dup2(fd, 1);
-		rrr = execve(str, x->args, x->env);
-		if (rrr == -1)
+		dup2(vars.fdd, 1);
+		close(vars.fdd);
+		vars.ex_res = execve(vars.str, x->args, x->env);
+		if (vars.ex_res == -1)
 			exit(127);
 	}
 	//parent process
-	waitpid(id, &rrr, 0);
-	if (WIFEXITED(rrr))
-		exit_status = WEXITSTATUS(rrr);
-	free(str);
+	waitpid(vars.id, &vars.ex_res, 0);
+	if (WIFEXITED(vars.ex_res))
+		exit_status = WEXITSTATUS(vars.ex_res);
+	free(vars.str);
+	close(vars.fdd);
 	dup2(x->temp_fd_0, 0);
 }
 

@@ -33,7 +33,7 @@ int		check_args_export(char *arg)
 	c = arg;
 	while (*c != '\0')
 	{
-		if (*c < 48 || (*c > 57 && *c < 61) || (*c > 61 && *c < 65)
+		if (*c < 47 || (*c > 57 && *c < 61) || (*c > 61 && *c < 65)
 		|| (*c > 90  && *c < 95) || *c == 96 || *c > 122)
 		{
 			write(1, "bash: export: '", 15);

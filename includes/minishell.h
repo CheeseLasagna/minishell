@@ -28,10 +28,19 @@ typedef struct	s_args
 	int		temp_fd_1;
 }               t_args;
 
+typedef struct	s_vars
+{
+	int id;
+	int fd[2];
+	int fdd;
+	int ex_res;
+	char *str;
+}				t_vars;
+
 /*
 **BUILTIN IMPLEMENTATIONS
 */
-void	cd(char **args);
+char	**cd(char **args, char **env);
 void	echo(char **args);
 void	envp(char **env);
 void	my_exit(char **arg, char **env);

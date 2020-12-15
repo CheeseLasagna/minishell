@@ -7,7 +7,8 @@ char	**new_double_array_unset(char *old, char **env, int oldlen)
 	char	**new1;
 	int		len;
 
-	len = find_doub_array_len(env);
+	//len = find_doub_array_len(env);
+	len = ft_strarrlen(env);
 	if (!(new = (char**)malloc(sizeof(char*) * len)))
 		return (env);
 	env1 = env;
@@ -18,7 +19,7 @@ char	**new_double_array_unset(char *old, char **env, int oldlen)
 		{
 			if(!(*new1 = ft_strdup(*env1)))
 			{
-				ft_strarrclear(new);
+				ft_strarrclear(&new);
 				return (env);
 			}
 			new1++;
@@ -29,7 +30,7 @@ char	**new_double_array_unset(char *old, char **env, int oldlen)
 	}
 	*new1 = NULL;
 	//free_arrah(env);
-	ft_strarrclear(new);
+	ft_strarrclear(&new);
 	return (new);	
 }
 		
