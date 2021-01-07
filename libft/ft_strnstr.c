@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_strnstr.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tlavelle <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: enoelia <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2020/05/11 11:04:47 by tlavelle          #+#    #+#             */
-/*   Updated: 2020/05/26 22:00:51 by tlavelle         ###   ########.fr       */
+/*   Created: 2020/04/29 22:39:52 by enoelia           #+#    #+#             */
+/*   Updated: 2020/05/25 13:33:19 by enoelia          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,28 +14,24 @@
 
 char	*ft_strnstr(const char *big, const char *little, size_t len)
 {
-	char	*first;
-	char	*second;
-	size_t	length;
+	size_t	i;
+	size_t	a;
 
-	first = (char*)big;
-	second = (char*)little;
-	length = len;
-	if (*second == '\0')
+	if (!ft_strlen(little))
 		return ((char*)big);
-	if (ft_strlen(little) > ft_strlen(big) || ft_strlen(little) > len)
-		return (NULL);
-	while (*big != '\0' && length != 0)
+	i = 0;
+	while (big[i] && i < len)
 	{
-		while (length-- != 0 && *first++ == *second++)
+		if (big[i] == little[0])
 		{
-			if (*second == '\0')
-				return ((char*)big);
+			a = 0;
+			while (big[i + a] && little[a] &&
+					big[i + a] == little[a] && a + i < len)
+				a++;
+			if (!little[a])
+				return ((char*)big + i);
 		}
-		length = --len;
-		big++;
-		first = (char*)big;
-		second = (char*)little;
+		i++;
 	}
 	return (NULL);
 }

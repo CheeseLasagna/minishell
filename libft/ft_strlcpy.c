@@ -3,30 +3,31 @@
 /*                                                        :::      ::::::::   */
 /*   ft_strlcpy.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tlavelle <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: enoelia <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2020/05/10 17:45:23 by tlavelle          #+#    #+#             */
-/*   Updated: 2020/05/26 10:24:16 by tlavelle         ###   ########.fr       */
+/*   Created: 2020/04/29 12:05:29 by enoelia           #+#    #+#             */
+/*   Updated: 2020/05/25 13:32:17 by enoelia          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-size_t	ft_strlcpy(char *dest, const char *src, size_t size)
+size_t	ft_strlcpy(char *dst, const char *src, size_t size)
 {
-	size_t len;
+	size_t	srclen;
 
-	if (!src)
+	if (!src && !dst)
 		return (0);
-	len = ft_strlen(src);
-	if (len + 1 < size)
+	srclen = ft_strlen(src);
+	if (srclen + 1 < size)
 	{
-		ft_memcpy(dest, src, len + 1);
+		ft_memcpy(dst, src, srclen);
+		dst[srclen] = '\0';
 	}
-	else if (size > 0)
+	else if (size != 0)
 	{
-		ft_memcpy(dest, src, size - 1);
-		dest[size - 1] = '\0';
+		ft_memcpy(dst, src, size - 1);
+		dst[size - 1] = '\0';
 	}
-	return (len);
+	return (srclen);
 }

@@ -3,59 +3,47 @@
 /*                                                        :::      ::::::::   */
 /*   ft_strtrim.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tlavelle <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: enoelia <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2020/05/13 12:30:00 by tlavelle          #+#    #+#             */
-/*   Updated: 2020/05/28 16:53:35 by tlavelle         ###   ########.fr       */
+/*   Created: 2020/04/30 18:32:54 by enoelia           #+#    #+#             */
+/*   Updated: 2020/05/22 17:29:58 by enoelia          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-int		inset(char const character, char const *set)
+static int	ft_charinset(char c, const char *set)
 {
-	while (*set != 0)
+	size_t	i;
+
+	i = 0;
+	while (set[i])
 	{
-		if (character == *set)
+		if (c == set[i])
 			return (1);
-		set++;
+		i++;
 	}
 	return (0);
 }
 
-char	*fillup(char *pointer, const char *s1, int len, int index)
+char		*ft_strtrim(char const *s1, char const *set)
 {
-	char	*counter;
+	size_t	i;
+	size_t	s1len;
+	char	*result;
 
-	counter = pointer;
-	while (len--)
-		*counter++ = s1[index++];
-	*counter = '\0';
-	return (pointer);
-}
-
-char	*ft_strtrim(char const *s1, char const *set)
-{
-	int		index;
-	int		index2;
-	char	*pointer;
-	int		len;
-
-	index = 0;
-	if (!s1)
+	if (!s1 || !set)
 		return (NULL);
-	index2 = ft_strlen(s1) - 1;
-	while (s1[index] && inset(s1[index], set))
-		index++;
-	if (s1[index] != 0)
-	{
-		while (index2 >= 0 && inset(s1[index2], set))
-			index2--;
-	}
-	len = index2 - index + 1;
-	pointer = (char*)malloc(sizeof(char) * (len + 1));
-	if (pointer == NULL)
+	s1len = ft_strlen(s1);
+	i = 0;
+	while (s1[i] && ft_charinset(s1[i], set))
+		i++;
+	while (s1[s1len - 1] && ft_charinset(s1[s1len - 1], set))
+		s1len--;
+	if (s1len < i)
+		i = s1len;
+	if (!(result = malloc(sizeof(char) * (s1len - i + 1))))
 		return (NULL);
-	fillup(pointer, s1, len, index);
-	return (pointer);
+	ft_strlcpy(result, s1 + i, s1len - i + 1);
+	return (result);
 }

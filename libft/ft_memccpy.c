@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_memccpy.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tlavelle <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: enoelia <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2020/05/09 14:14:40 by tlavelle          #+#    #+#             */
-/*   Updated: 2020/05/26 22:20:00 by tlavelle         ###   ########.fr       */
+/*   Created: 2020/05/03 13:29:12 by enoelia           #+#    #+#             */
+/*   Updated: 2020/05/25 12:50:04 by enoelia          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,23 +14,21 @@
 
 void	*ft_memccpy(void *dest, const void *src, int c, size_t n)
 {
-	unsigned char *destination;
-	unsigned char *source;
-	unsigned char a;
+	size_t			i;
+	unsigned char	*charsrc;
+	unsigned char	*chardest;
+	unsigned char	charc;
 
-	if (!dest && !src)
-		return (NULL);
-	destination = (unsigned char*)dest;
-	source = (unsigned char*)src;
-	a = (unsigned char)c;
-	while (n != 0)
+	charsrc = (unsigned char *)src;
+	chardest = (unsigned char *)dest;
+	charc = (unsigned char)c;
+	i = 0;
+	while (i < n)
 	{
-		*destination++ = *source++;
-		if (*(destination - 1) == a)
-		{
-			return (destination);
-		}
-		n--;
+		chardest[i] = charsrc[i];
+		if (charsrc[i] == charc)
+			return (&chardest[i + 1]);
+		i++;
 	}
 	return (NULL);
 }

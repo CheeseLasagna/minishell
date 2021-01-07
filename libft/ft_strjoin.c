@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_strjoin.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tlavelle <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: enoelia <enoelia@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2020/05/12 18:59:29 by tlavelle          #+#    #+#             */
-/*   Updated: 2020/05/28 16:52:40 by tlavelle         ###   ########.fr       */
+/*   Created: 2020/04/30 15:24:24 by enoelia           #+#    #+#             */
+/*   Updated: 2020/10/14 16:52:12 by enoelia          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,19 +14,28 @@
 
 char	*ft_strjoin(char const *s1, char const *s2)
 {
-	char *pointer;
-	char *assign;
+	char	*str;
+	char	*res;
+	size_t	len;
 
-	if (!s1 || !s2)
+	if (s1 == NULL || s2 == NULL)
 		return (NULL);
-	pointer = (char*)malloc(ft_strlen(s1) + ft_strlen(s2) + 1);
-	assign = pointer;
-	if (pointer == NULL)
+	len = ft_strlen(s1) + ft_strlen(s2);
+	if ((str = (char *)malloc(len + 1)) == NULL)
 		return (NULL);
+	res = str;
 	while (*s1)
-		*assign++ = *s1++;
+	{
+		*str = *s1;
+		str++;
+		s1++;
+	}
 	while (*s2)
-		*assign++ = *s2++;
-	*assign = '\0';
-	return (pointer);
+	{
+		*str = *s2;
+		str++;
+		s2++;
+	}
+	*str = '\0';
+	return (res);
 }
